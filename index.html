@@ -13,8 +13,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start; /* Adjusted to move content upwards */
             min-height: 100vh;
+        }
+
+        header {
+            margin: 20px;
         }
 
         #content-container {
@@ -22,7 +26,6 @@
             flex-direction: row;
             max-width: 1200px;
             width: 100%;
-            margin: 20px;
             background-color: white;
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
@@ -66,17 +69,6 @@
             background-color: #0056b3;
         }
 
-        #previous-requests {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #previous-requests li {
-            margin: 5px 0;
-            cursor: pointer;
-            color: #007bff;
-        }
-
         /* Additional styling for chat messages */
         .message {
             padding: 5px 0;
@@ -90,12 +82,20 @@
         .bot-message {
             color: #00b300;
         }
+
+        /* Phone number input styling */
+        #phone-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <!-- Header Section -->
     <header>
-        <h1 style="text-align: center; margin: 20px;">ChatBot</h1>
+        <h1 style="text-align: center;">ChatBot</h1>
     </header>
 
     <!-- Chat Window Section -->
@@ -104,6 +104,9 @@
             <!-- Chat messages will be displayed here -->
         </div>
     </div>
+
+    <!-- Phone Number Input Section -->
+    <input type="tel" id="phone-input" placeholder="Enter your phone number...">
 
     <!-- Input Area Section -->
     <div id="input-area">
