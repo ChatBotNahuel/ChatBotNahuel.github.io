@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Notification Chatbot</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <div id="chat-window">
+        <!-- Chat messages will be displayed here -->
+    </div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function displayMessage(message, sender) {
+            const chatWindow = document.getElementById('chat-window');
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message');
+            messageContainer.innerText = sender + ': ' + message;
+            chatWindow.appendChild(messageContainer);
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            displayMessage(userInput, 'You');
+
+            // Send user input to the backend for processing
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    input: userInput,
+                }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                const chatbotResponse = data.response;
+                displayMessage(chatbotResponse, 'Chatbot');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+            document.getElementById('user-input').value = '';
+        }
+    </script>
+</body>
+</html>
