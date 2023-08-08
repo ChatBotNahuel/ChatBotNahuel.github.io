@@ -115,7 +115,10 @@
     </div>
 
     <!-- JavaScript Section -->
+    <script src="https://cdn.jsdelivr.net/npm/openai@0.27.0/dist/openai.min.js"></script>
     <script>
+        const openai = new OpenAI('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'); // Replace with your OpenAI API key
+
         function displayMessage(message, sender) {
             const chatWindow = document.getElementById('chat-window');
             const messageContainer = document.createElement('div');
@@ -126,15 +129,23 @@
             chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to bottom
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
-            if (userInput.trim() === '') return; // Don't send empty messages
+            if (userInput.trim() === '') return;
 
             displayMessage(userInput, 'You');
 
-            // Send user input to the backend for processing (simulated here)
-            const chatbotResponse = "This is a simulated response from ChatBot.";
-            displayMessage(chatbotResponse, 'Chatbot');
+            try {
+                const response = await openai.complete({
+                    prompt: userInput,
+                    max_tokens: 50
+                });
+
+                const chatbotResponse = response.data.choices[0].text.trim();
+                displayMessage(chatbotResponse, 'Chatbot');
+            } catch (error) {
+                console.error('Error:', error);
+            }
 
             document.getElementById('user-input').value = '';
         }
