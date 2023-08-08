@@ -93,16 +93,25 @@
     </style>
 </head>
 <body>
+    <!-- Header Section -->
+    <header>
+        <h1 style="text-align: center; margin: 20px;">ChatBot</h1>
+    </header>
+
+    <!-- Chat Window Section -->
     <div id="content-container">
         <div id="chat-window">
             <!-- Chat messages will be displayed here -->
         </div>
     </div>
+
+    <!-- Input Area Section -->
     <div id="input-area">
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-button" onclick="sendMessage()">Send</button>
     </div>
 
+    <!-- JavaScript Section -->
     <script>
         function displayMessage(message, sender) {
             const chatWindow = document.getElementById('chat-window');
