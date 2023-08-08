@@ -93,48 +93,53 @@
     </style>
 </head>
 <body>
-    <!-- Header Section -->
     <header>
         <h1 style="text-align: center;">ChatBot</h1>
     </header>
 
-    <!-- Chat Window Section -->
     <div id="content-container">
         <div id="chat-window">
             <!-- Chat messages will be displayed here -->
         </div>
     </div>
 
-    <!-- Phone Number Input Section -->
+    <!-- API Key Input Section -->
+    <div>
+        <label for="api-key-input">Enter Your API Key:</label>
+        <input type="text" id="api-key-input" placeholder="Paste your API key here...">
+        <button onclick="setApiKey()">Set API Key</button>
+    </div>
+
     <input type="tel" id="phone-input" placeholder="Enter your phone number...">
 
-    <!-- Input Area Section -->
     <div id="input-area">
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-button" onclick="sendMessage()">Send</button>
     </div>
 
-    <!-- JavaScript Section -->
     <script>
-        const apiKey = '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'; // Replace with your actual API key
+        let apiKey = '';
         const chatWindow = document.getElementById('chat-window');
-    
+
         function displayMessage(message, sender) {
             const messageContainer = document.createElement('div');
             messageContainer.classList.add('message');
-            messageContainer.classList.add(sender.toLowerCase() + '-message'); // Apply user or bot styling
+            messageContainer.classList.add(sender.toLowerCase() + '-message');
             messageContainer.innerText = sender + ': ' + message;
             chatWindow.appendChild(messageContainer);
-            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
-    
+
+        function setApiKey() {
+            apiKey = document.getElementById('api-key-input').value;
+        }
+
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
-            if (userInput.trim() === '') return; // Don't send empty messages
-    
+            if (userInput.trim() === '') return;
+
             displayMessage(userInput, 'You');
-    
-            // Send user input to the backend for processing (simulated here)
+
             const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
                 method: 'POST',
                 headers: {
@@ -143,17 +148,17 @@
                 },
                 body: JSON.stringify({
                     prompt: userInput,
-                    max_tokens: 50 // You can adjust this value to control response length
+                    max_tokens: 50
                 })
             });
-    
+
             const data = await response.json();
             const chatbotResponse = data.choices[0].text;
-    
+
             displayMessage(chatbotResponse, 'Chatbot');
-    
+
             document.getElementById('user-input').value = '';
         }
-    </script>    
+    </script>
 </body>
 </html>
