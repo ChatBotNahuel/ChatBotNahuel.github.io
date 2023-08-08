@@ -76,6 +76,20 @@
             cursor: pointer;
             color: #007bff;
         }
+
+        /* Additional styling for chat messages */
+        .message {
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .user-message {
+            color: #007bff;
+        }
+
+        .bot-message {
+            color: #00b300;
+        }
     </style>
 </head>
 <body>
@@ -94,6 +108,7 @@
             const chatWindow = document.getElementById('chat-window');
             const messageContainer = document.createElement('div');
             messageContainer.classList.add('message');
+            messageContainer.classList.add(sender.toLowerCase() + '-message'); // Apply user or bot styling
             messageContainer.innerText = sender + ': ' + message;
             chatWindow.appendChild(messageContainer);
             chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to bottom
