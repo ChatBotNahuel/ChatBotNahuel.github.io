@@ -161,7 +161,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`
-                },
+                    },
                     body: JSON.stringify({
                         prompt: userInput,
                         max_tokens: 50
@@ -171,32 +171,38 @@
                 const responseData = await response.json();
 
                 if (response.ok) {
-                    console.log('API Response:', responseData); // Log the response data
+                    console.log('API Response:', responseData);
                     const chatbotResponse = responseData.choices[0].text;
 
-                    const companySymbolMatch = chatbotResponse.match(/of ([A-Z]+)/); // Look for a stock symbol preceded by "of "
+                    const companySymbolMatch = chatbotResponse.match(/of ([A-Z]+)/);
                     if (companySymbolMatch) {
                         const stockSymbol = companySymbolMatch[1];
                         const stockPriceResponse = await fetchStockPrice(stockSymbol);
-                        const stockPriceData = await stockPriceResponse.json();
-                        const stockPrice = stockPriceData.latestPrice;
+                        
+                        if (stockPriceResponse) {
+                            const stockPriceData = stockPriceResponse.data; // Extract data from response
+                            const stockPrice = stockPriceData.latestPrice;
 
-                        displayMessage(`The current stock price of ${stockSymbol} is $${stockPrice.toFixed(2)}`, 'Chatbot');
+                            displayMessage(`The current stock price of ${stockSymbol} is $${stockPrice.toFixed(2)}`, 'Chatbot');
+                        } else {
+                            displayMessage('An error occurred while fetching stock price.', 'Chatbot');
+                        }
                     } else {
                         displayMessage(chatbotResponse, 'Chatbot');
                     }
                 } else {
-                    console.error('API Error:', responseData); // Log the error response data
+                    console.error('API Error:', responseData);
                     displayMessage('An error occurred while processing your request.', 'Chatbot');
                 }
 
             } catch (error) {
-                console.error('An error occurred:', error); // Log any other errors
+                console.error('An error occurred:', error);
                 displayMessage('An error occurred while processing your request.', 'Chatbot');
             }
 
             document.getElementById('user-input').value = '';
         }
+
 
 
         async function fetchStockPrice(symbol) {
@@ -207,10 +213,10 @@
                     }
                 });
 
-                return response.data;
+                return response; // Return the entire response object
             } catch (error) {
                 console.error('An error occurred while fetching stock price:', error);
-                return { text: 'An error occurred while fetching stock price.' };
+                return null; // Return null to indicate error
             }
         }
     </script>
