@@ -150,45 +150,33 @@
         }
 
         async function sendMessage() {
-            const userInput = document.getElementById('user-input').value;
-            if (userInput.trim() === '') return;
+            const userInput = document.getElementById('user-input').value.trim().toLowerCase();
+            if (userInput === '') return;
 
             displayMessage(userInput, 'You');
 
             try {
                 const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        prompt: userInput,
-                        max_tokens: 50
-                    })
+                    // Fetching OpenAI response...
                 });
 
                 const responseData = await response.json();
 
                 if (response.ok) {
-                    console.log('API Response:', responseData);
                     const chatbotResponse = responseData.choices[0].text;
 
-                    const companySymbolMatch = chatbotResponse.match(/of ([A-Z]+)/);
+                    const companySymbolMatch = chatbotResponse.match(/(?:stock price of|stock price for) ([A-Za-z]+)/i);
                     if (companySymbolMatch) {
-                        const stockSymbol = companySymbolMatch[1];
-                        const stockPriceResponse = await fetchStockPrice(stockSymbol);
-                        
-                        if (stockPriceResponse) {
-                            const stockPriceData = stockPriceResponse.data; // Extract data from response
-                            const stockPrice = stockPriceData.latestPrice;
+                        const stockSymbol = companySymbolMatch[1].toUpperCase(); // Convert to uppercase
+                        const stockPrice = await fetchStockPrice(stockSymbol);
 
+                        if (stockPrice !== null) {
                             displayMessage(`The current stock price of ${stockSymbol} is $${stockPrice.toFixed(2)}`, 'Chatbot');
                         } else {
                             displayMessage('An error occurred while fetching stock price.', 'Chatbot');
                         }
                     } else {
-                        displayMessage(chatbotResponse, 'Chatbot');
+                        displayMessage(chatbotResponse.trim(), 'Chatbot');
                     }
                 } else {
                     console.error('API Error:', responseData);
@@ -203,8 +191,6 @@
             document.getElementById('user-input').value = '';
         }
 
-
-
         async function fetchStockPrice(symbol) {
             try {
                 const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${symbol}/quote`, {
@@ -213,10 +199,10 @@
                     }
                 });
 
-                return response; // Return the entire response object
+                return response.data.latestPrice;
             } catch (error) {
                 console.error('An error occurred while fetching stock price:', error);
-                return null; // Return null to indicate error
+                return null;
             }
         }
     </script>
