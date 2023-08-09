@@ -155,28 +155,30 @@
 
             displayMessage(userInput, 'You');
 
-            if (userInput.toLowerCase().includes('stock prices of')) {
-                const symbol = userInput.split('stock prices of ')[1];
-                const response = await fetchStockPrice(symbol);
-                const chatbotResponse = await response.text();
+            const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: userInput,
+                    max_tokens: 50
+                })
+            });
 
-                displayMessage(chatbotResponse, 'Chatbot');
+            const data = await response.json();
+            const chatbotResponse = data.choices[0].text;
+
+            const companySymbolMatch = chatbotResponse.match(/\(([A-Z]+)\)/); // Look for a stock symbol in parentheses
+            if (companySymbolMatch) {
+                const stockSymbol = companySymbolMatch[1];
+                const stockPriceResponse = await fetchStockPrice(stockSymbol);
+                const stockPriceData = await stockPriceResponse.json();
+                const stockPrice = stockPriceData.latestPrice;
+
+                displayMessage(`The current stock price of ${stockSymbol} is $${stockPrice.toFixed(2)}`, 'Chatbot');
             } else {
-                const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        prompt: userInput,
-                        max_tokens: 50
-                    })
-                });
-
-                const data = await response.json();
-                const chatbotResponse = data.choices[0].text;
-
                 displayMessage(chatbotResponse, 'Chatbot');
             }
 
