@@ -201,15 +201,15 @@
 
         async function fetchStockPrice(symbol) {
             try {
-                const response = await axios.get(`https://iex-cloud.p.rapidapi.com/stock/${symbol}/quote`, {
-                    headers: {
-                        'X-RapidAPI-Host': 'iex-cloud.p.rapidapi.com',
-                        'X-RapidAPI-Key': iexCloudApiKey // Use the IEX Cloud API key here
+                const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${symbol}/quote`, {
+                    params: {
+                        token: iexCloudApiKey
                     }
                 });
 
-                return response;
+                return response.data;
             } catch (error) {
+                console.error('An error occurred while fetching stock price:', error);
                 return { text: 'An error occurred while fetching stock price.' };
             }
         }
