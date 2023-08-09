@@ -170,7 +170,7 @@
             const data = await response.json();
             const chatbotResponse = data.choices[0].text;
 
-            const companySymbolMatch = chatbotResponse.match(/\(([A-Z]+)\)/); // Look for a stock symbol in parentheses
+            const companySymbolMatch = chatbotResponse.match(/of ([A-Z]+)/); // Look for a stock symbol preceded by "of "
             if (companySymbolMatch) {
                 const stockSymbol = companySymbolMatch[1];
                 const stockPriceResponse = await fetchStockPrice(stockSymbol);
