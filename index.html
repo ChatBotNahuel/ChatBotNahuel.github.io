@@ -110,6 +110,13 @@
         <button onclick="setApiKey()">Set API Key</button>
     </div>
 
+    <!-- IEX Cloud API Key Input Section -->
+    <div>
+        <label for="iex-cloud-api-key-input">Enter Your IEX Cloud API Key:</label>
+        <input type="text" id="iex-cloud-api-key-input" placeholder="Paste your IEX Cloud API key here...">
+        <button onclick="setIexCloudApiKey()">Set IEX Cloud API Key</button>
+    </div>
+
     <input type="tel" id="phone-input" placeholder="Enter your phone number...">
 
     <div id="input-area">
@@ -117,8 +124,12 @@
         <button id="send-button" onclick="sendMessage()">Send</button>
     </div>
 
+    <!-- Include the RapidAPI library script -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
         let apiKey = '';
+        let iexCloudApiKey = '';  // Initialize IEX Cloud API key
         const chatWindow = document.getElementById('chat-window');
 
         function displayMessage(message, sender) {
@@ -134,30 +145,57 @@
             apiKey = document.getElementById('api-key-input').value;
         }
 
+        function setIexCloudApiKey() {
+            iexCloudApiKey = document.getElementById('iex-cloud-api-key-input').value;
+        }
+
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
             if (userInput.trim() === '') return;
 
             displayMessage(userInput, 'You');
 
-            const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    prompt: userInput,
-                    max_tokens: 50
-                })
-            });
+            if (userInput.toLowerCase().includes('stock prices of')) {
+                const symbol = userInput.split('stock prices of ')[1];
+                const response = await fetchStockPrice(symbol);
+                const chatbotResponse = await response.text();
 
-            const data = await response.json();
-            const chatbotResponse = data.choices[0].text;
+                displayMessage(chatbotResponse, 'Chatbot');
+            } else {
+                const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        prompt: userInput,
+                        max_tokens: 50
+                    })
+                });
 
-            displayMessage(chatbotResponse, 'Chatbot');
+                const data = await response.json();
+                const chatbotResponse = data.choices[0].text;
+
+                displayMessage(chatbotResponse, 'Chatbot');
+            }
 
             document.getElementById('user-input').value = '';
+        }
+
+        async function fetchStockPrice(symbol) {
+            try {
+                const response = await axios.get(`https://iex-cloud.p.rapidapi.com/stock/${symbol}/quote`, {
+                    headers: {
+                        'X-RapidAPI-Host': 'iex-cloud.p.rapidapi.com',
+                        'X-RapidAPI-Key': iexCloudApiKey // Use the IEX Cloud API key here
+                    }
+                });
+
+                return response;
+            } catch (error) {
+                return { text: 'An error occurred while fetching stock price.' };
+            }
         }
     </script>
 </body>
